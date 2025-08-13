@@ -16,17 +16,17 @@ import * as echarts from 'echarts'
 
 // 假设这里直接引入 users 数据
 import { useStore } from 'vuex'
-import { ElMessage } from 'element-plus'
 
 const store = useStore()
 
 const chartRef = ref(null)
 let chartInstance = null
 
+const users = ref( store.state.users)
 // 统计数据
-const totalUsers = computed(() => store.state.users.length)
-const activeUsers = computed(() => store.state.users.filter(u => u.status === '激活').length)
-const inactiveUsers = computed(() => store.state.users.filter(u => u.status === '禁用').length)
+const totalUsers = computed(() => users.value.length)
+const activeUsers = computed(() => users.value.filter(u => u.status === '激活').length)
+const inactiveUsers = computed(() => users.value.filter(u => u.status === '禁用').length)
 const activePercent = computed(() => ((activeUsers.value / totalUsers.value) * 100).toFixed(1))
 const inactivePercent = computed(() => ((inactiveUsers.value / totalUsers.value) * 100).toFixed(1))
 
