@@ -10,4 +10,10 @@ Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://
 feature 1 : button + -
 feature 2: 负数是红色
 
+2. vue router
+npm install vue-router@4
+
+vue-router
+router-view 显示不同视图
+
 
