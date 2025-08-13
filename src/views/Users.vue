@@ -29,6 +29,19 @@
             </el-tag>
         </template>
         </el-table-column>
+        <el-table-column label="状态" width="120">
+            <template #default="scope">
+                <el-switch
+                v-model="scope.row.status"
+                active-value="激活"
+                inactive-value="禁用"
+                active-color="#13ce66"
+                inactive-color="#ff4949"
+                @change="handleStatusChange(scope.row)"
+                />
+            </template>
+    </el-table-column>
+
     </el-table>
 
     <!-- 分页 -->
@@ -50,12 +63,13 @@
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="form.email" />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-            <el-select v-model="form.status" placeholder="请选择状态">
-                <el-option label="在线" value="在线"></el-option>
-                <el-option label="离线" value="离线"></el-option>
-            </el-select>
-        </el-form-item>
+   <el-form-item label="状态" prop="status">
+  <el-select v-model="form.status" placeholder="请选择状态">
+    <el-option label="激活" value="激活"></el-option>
+    <el-option label="禁用" value="禁用"></el-option>
+  </el-select>
+</el-form-item>
+
 
       </el-form>
       <template #footer>
@@ -70,10 +84,11 @@
 import { ref, computed, watch } from 'vue'
 
 const users = ref([
-  { id: 1, name: '张三', email: 'zhangsan@example.com', status: '在线' },
-  { id: 2, name: '李四', email: 'lisi@example.com', status: '离线' },
-  { id: 3, name: '王五', email: 'wangwu@example.com', status: '在线' },
+  { id: 1, name: '张三', email: 'zhangsan@example.com', status: '激活' },
+  { id: 2, name: '李四', email: 'lisi@example.com', status: '禁用' },
+  { id: 3, name: '王五', email: 'wangwu@example.com', status: '激活' },
 ])
+
 
 
 const searchQuery = ref('')
@@ -122,9 +137,10 @@ const rules = {
 
 const openAddDialog = () => {
   isEdit.value = false
-  form.value = { id: null, name: '', email: '' }
+  form.value = { id: null, name: '', email: '', status: '激活' } // 默认激活
   dialogVisible.value = true
 }
+
 
 const openEditDialog = (user) => {
   isEdit.value = true
@@ -135,20 +151,25 @@ const openEditDialog = (user) => {
 const saveUser = () => {
   userForm.value.validate(valid => {
     if (!valid) return
-  
     if (isEdit.value) {
-        const index = users.value.findIndex(u => u.id === form.value.id)
-        if (index !== -1) users.value[index] = { ...form.value }
+      const index = users.value.findIndex(u => u.id === form.value.id)
+      if (index !== -1) users.value[index] = { ...form.value }
     } else {
-        const newId = Math.max(...users.value.map(u => u.id)) + 1
-        users.value.push({ id: newId, ...form.value })
+      const newId = Math.max(...users.value.map(u => u.id), 0) + 1
+      users.value.push({  ...form.value, id: newId })
     }
     dialogVisible.value = false
-
-    })
+  })
 }
+
 
 const deleteUser = (user) => {
   users.value = users.value.filter(u => u.id !== user.id)
 }
+
+const handleStatusChange = (user) => {
+  console.log(`${user.name} 状态已切换为 ${user.status}`)
+  // 如果有接口，这里可以调用更新状态的接口
+}
+
 </script>
