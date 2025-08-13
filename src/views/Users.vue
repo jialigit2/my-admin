@@ -22,6 +22,13 @@
           <el-button type="danger" size="small" @click="deleteUser(scope.row)">删除</el-button>
         </template>
       </el-table-column>
+      <el-table-column label="状态" width="100">
+        <template #default="scope">
+            <el-tag :type="scope.row.status === '在线' ? 'success' : 'info'">
+            {{ scope.row.status }}
+            </el-tag>
+        </template>
+        </el-table-column>
     </el-table>
 
     <!-- 分页 -->
@@ -43,6 +50,13 @@
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="form.email" />
         </el-form-item>
+        <el-form-item label="状态" prop="status">
+            <el-select v-model="form.status" placeholder="请选择状态">
+                <el-option label="在线" value="在线"></el-option>
+                <el-option label="离线" value="离线"></el-option>
+            </el-select>
+        </el-form-item>
+
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
@@ -56,14 +70,11 @@
 import { ref, computed, watch } from 'vue'
 
 const users = ref([
-  { id: 1, name: '张三', email: 'zhangsan@example.com' },
-  { id: 2, name: '李四', email: 'lisi@example.com' },
-  { id: 3, name: '王五', email: 'wangwu@example.com' },
-  { id: 4, name: '赵六', email: 'zhaoliu@example.com' },
-  { id: 5, name: '钱七', email: 'qianqi@example.com' },
-  { id: 6, name: '孙八', email: 'sunba@example.com' },
-  { id: 7, name: '周九', email: 'zhoujiu@example.com' },
+  { id: 1, name: '张三', email: 'zhangsan@example.com', status: '在线' },
+  { id: 2, name: '李四', email: 'lisi@example.com', status: '离线' },
+  { id: 3, name: '王五', email: 'wangwu@example.com', status: '在线' },
 ])
+
 
 const searchQuery = ref('')
 const pageSize = 3
