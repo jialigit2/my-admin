@@ -16,4 +16,8 @@ npm install vue-router@4
 vue-router
 router-view 显示不同视图
 
+3. element-plus
+npm install element-plus
+
+
 
