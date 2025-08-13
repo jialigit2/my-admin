@@ -36,11 +36,11 @@
 
     <!-- 弹窗表单 -->
     <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑用户' : '新增用户'">
-      <el-form :model="form" label-width="80px">
-        <el-form-item label="姓名">
+      <el-form :model="form" :rules="rules" ref="userForm" label-width="80px">
+        <el-form-item label="姓名" prop="name">
           <el-input v-model="form.name" />
         </el-form-item>
-        <el-form-item label="邮箱">
+        <el-form-item label="邮箱" prop="email">
           <el-input v-model="form.email" />
         </el-form-item>
       </el-form>
@@ -95,6 +95,19 @@ const handlePageChange = (page) => {
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const form = ref({ id: null, name: '', email: '' })
+const userForm = ref(null)
+
+// 表单规则
+const rules = {
+  name: [
+    { required: true, message: '姓名不能为空', trigger: 'blur' }
+  ],
+  email: [
+    { required: true, message: '邮箱不能为空', trigger: 'blur' },
+    { type: 'email', message: '邮箱格式不正确', trigger: 'blur' }
+  ]
+}
+
 
 const openAddDialog = () => {
   isEdit.value = false
@@ -109,14 +122,19 @@ const openEditDialog = (user) => {
 }
 
 const saveUser = () => {
-  if (isEdit.value) {
-    const index = users.value.findIndex(u => u.id === form.value.id)
-    if (index !== -1) users.value[index] = { ...form.value }
-  } else {
-    const newId = Math.max(...users.value.map(u => u.id)) + 1
-    users.value.push({ id: newId, ...form.value })
-  }
-  dialogVisible.value = false
+  userForm.value.validate(valid => {
+    if (!valid) return
+  
+    if (isEdit.value) {
+        const index = users.value.findIndex(u => u.id === form.value.id)
+        if (index !== -1) users.value[index] = { ...form.value }
+    } else {
+        const newId = Math.max(...users.value.map(u => u.id)) + 1
+        users.value.push({ id: newId, ...form.value })
+    }
+    dialogVisible.value = false
+
+    })
 }
 
 const deleteUser = (user) => {
