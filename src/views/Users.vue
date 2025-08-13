@@ -82,14 +82,10 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useStore } from 'vuex'
+import { ElMessage } from 'element-plus'
 
-const users = ref([
-  { id: 1, name: '张三', email: 'zhangsan@example.com', status: '激活' },
-  { id: 2, name: '李四', email: 'lisi@example.com', status: '禁用' },
-  { id: 3, name: '王五', email: 'wangwu@example.com', status: '激活' },
-])
-
-
+const store = useStore()
 
 const searchQuery = ref('')
 const pageSize = 3
@@ -97,7 +93,7 @@ const currentPage = ref(1)
 
 // 过滤数据
 const filteredUsers = computed(() => {
-  return users.value.filter(user =>
+  return store.state.users.filter(user =>
     user.name.includes(searchQuery.value) ||
     user.email.includes(searchQuery.value)
   )
@@ -152,11 +148,12 @@ const saveUser = () => {
   userForm.value.validate(valid => {
     if (!valid) return
     if (isEdit.value) {
-      const index = users.value.findIndex(u => u.id === form.value.id)
-      if (index !== -1) users.value[index] = { ...form.value }
+      store.commit('updateUser', form.value)
+      ElMessage.success('用户已更新')
     } else {
-      const newId = Math.max(...users.value.map(u => u.id), 0) + 1
-      users.value.push({  ...form.value, id: newId })
+      const newId = Math.max(...store.state.users.map(u => u.id), 0) + 1
+      store.commit('addUser', { ...form.value, id: newId })
+      ElMessage.success('用户已新增')
     }
     dialogVisible.value = false
   })
@@ -164,11 +161,12 @@ const saveUser = () => {
 
 
 const deleteUser = (user) => {
-  users.value = users.value.filter(u => u.id !== user.id)
+  store.commit('deleteUser', user.id)
+  ElMessage.success('用户已删除')
 }
 
 const handleStatusChange = (user) => {
-  console.log(`${user.name} 状态已切换为 ${user.status}`)
+  store.commit('updateUserStatus', { id: user.id, status: user.status })
   // 如果有接口，这里可以调用更新状态的接口
 }
 
