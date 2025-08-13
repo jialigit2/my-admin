@@ -10,6 +10,7 @@
       clearable
     />
 
+    <el-button type="primary" @click="openAddDialog">新增用户</el-button>
     <!-- 表格 -->
     <el-table :data="pagedUsers" style="width: 100%">
       <el-table-column prop="id" label="ID" width="80" />
@@ -17,7 +18,7 @@
       <el-table-column prop="email" label="邮箱" />
       <el-table-column label="操作" width="180">
         <template #default="scope">
-          <el-button type="primary" size="small" @click="editUser(scope.row)">编辑</el-button>
+           <el-button type="primary" size="small" @click="openEditDialog(scope.row)">编辑</el-button>
           <el-button type="danger" size="small" @click="deleteUser(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -32,6 +33,22 @@
       :current-page="currentPage"
       @current-change="handlePageChange"
     />
+
+    <!-- 弹窗表单 -->
+    <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑用户' : '新增用户'">
+      <el-form :model="form" label-width="80px">
+        <el-form-item label="姓名">
+          <el-input v-model="form.name" />
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="form.email" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="saveUser">保存</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -75,11 +92,34 @@ const handlePageChange = (page) => {
   currentPage.value = page
 }
 
-const editUser = (user) => {
-  console.log('编辑用户:', user)
+const dialogVisible = ref(false)
+const isEdit = ref(false)
+const form = ref({ id: null, name: '', email: '' })
+
+const openAddDialog = () => {
+  isEdit.value = false
+  form.value = { id: null, name: '', email: '' }
+  dialogVisible.value = true
+}
+
+const openEditDialog = (user) => {
+  isEdit.value = true
+  form.value = { ...user }
+  dialogVisible.value = true
+}
+
+const saveUser = () => {
+  if (isEdit.value) {
+    const index = users.value.findIndex(u => u.id === form.value.id)
+    if (index !== -1) users.value[index] = { ...form.value }
+  } else {
+    const newId = Math.max(...users.value.map(u => u.id)) + 1
+    users.value.push({ id: newId, ...form.value })
+  }
+  dialogVisible.value = false
 }
 
 const deleteUser = (user) => {
-  console.log('删除用户:', user)
+  users.value = users.value.filter(u => u.id !== user.id)
 }
 </script>
